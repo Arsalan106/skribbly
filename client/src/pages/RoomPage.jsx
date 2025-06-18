@@ -7,6 +7,23 @@ const RoomPage = () => {
     const [elements, setElements] = useState([]);
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
+    const [prev,setPrev]=useState([]);
+    console.log("ele",elements);
+    const clearCanvas=()=>{
+        const canvas=canvasRef.current;
+        const ctx=contextRef.current;
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        setElements([]);
+    }
+    const storePrev=[];
+    const handleUndo=()=>{
+        setPrev((prevELements)=>[...prevELements,elements[elements.length-1]]);
+        setElements((prevELements)=>prevELements.slice(0,-1));
+    }
+    const handleRedo=()=>{
+        setElements((prevELements)=>[...prevELements,prev[prev.length-1]]);
+        setPrev((prevELements)=>prevELements.slice(0,-1));
+    }
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -67,24 +84,26 @@ const RoomPage = () => {
 
                     {/* Action Buttons */}
                     <div className="flex items-center gap-3">
-                        <button className="bg-blue-500 text-white px-4 py-1.5 rounded-md hover:bg-blue-600 transition text-sm font-medium">
+                        <button disabled={elements.length===0} onClick={handleUndo}   className="bg-blue-500 text-white px-4 py-1.5 rounded-md hover:bg-blue-600 transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
                             Undo
                         </button>
-                        <button className="border border-blue-500 text-blue-500 px-4 py-1.5 rounded-md hover:bg-blue-50 transition text-sm font-medium">
+                        <button onClick={handleRedo} disabled={prev.length===0} className="border border-blue-500 text-blue-500 px-4 py-1.5 rounded-md hover:bg-blue-50 transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
                             Redo
                         </button>
-                        <button className="bg-red-500 text-white px-4 py-1.5 rounded-md hover:bg-red-600 transition text-sm font-medium">
+                        <button onClick={clearCanvas}  className="bg-red-500 text-white px-4 py-1.5 rounded-md hover:bg-red-600 transition text-sm font-medium">
                             Clear Canvas
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div className="w-10/12 mt-4 canvas-box mx-auto">
-                <WhiteBoard
+            <div className="w-10/12 ml-[13%] mt-4 canvas-box mx-auto">
+                <WhiteBoard 
                     canvasRef={canvasRef}
                     contextRef={contextRef}
                     elements={elements}
+                    color={color}
+                    setColor={setColor}
                     setElements={setElements}
                     tool={tool}
                 />

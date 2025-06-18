@@ -1,19 +1,26 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import rough from 'roughjs/bin/rough';
 const roughGenerator=rough.generator();
-const WhiteBoard = ({ canvasRef, contextRef, elements, setElements, tool }) => {
+const WhiteBoard = ({ canvasRef, contextRef, elements, setElements, tool,color,setColor }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [start,setStart]=useState([]);
   const [endPoint,setEndPoint]=useState([]);
-
-  useEffect(() => {
+  console.log(color)
+  useEffect(() => { 
     const canvas = canvasRef.current;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    //set the context
     const ctx = canvas.getContext("2d");
+    ctx.strokeStyle=color;
+    ctx.lineCap="round";
+    ctx.lineWidth=2;
+    //store the context
     contextRef.current = ctx;
   }, []);
-
+  useEffect(()=>{
+    contextRef.current.strokeStyle=color
+  },[color])
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
@@ -23,7 +30,7 @@ const WhiteBoard = ({ canvasRef, contextRef, elements, setElements, tool }) => {
     elements.forEach((element) => {
       // draw free sketch
       if (element.type === "pencil") {
-        roughCanvas.linearPath(element.path);
+        roughCanvas.linearPath(element.path,{stroke:element.stroke,strokeWidth:5,roughness:0});
       } 
 
       //draw straight line
@@ -32,16 +39,20 @@ const WhiteBoard = ({ canvasRef, contextRef, elements, setElements, tool }) => {
             element.x,
             element.y,
             element.width,
-            element.height
+            element.height,
+            {stroke:element.stroke,roughness:0,strokeWidth:2}
+
         )
         roughCanvas.draw(line)
       }
+      //draw rectangle
       else if(element.type==="rectangle"){
         const rec=roughGenerator.rectangle(
             element.x,
             element.y,
             element.width,
-            element.height
+            element.height,
+            {stroke:element.stroke,roughness:0, strokeWidth: 2}
         );
         roughCanvas.draw(rec);
       }
@@ -58,7 +69,7 @@ const WhiteBoard = ({ canvasRef, contextRef, elements, setElements, tool }) => {
             {
                 type: "pencil",
                 path: [[offsetX, offsetY]],
-                stroke: "black",
+                stroke:color
             },
         ]);
     }
@@ -72,7 +83,7 @@ const WhiteBoard = ({ canvasRef, contextRef, elements, setElements, tool }) => {
                 y:offsetY,
                 width:offsetX,
                 height:offsetY,
-                stroke:"black"
+                stroke:color
             }
         ])
     }   
@@ -86,7 +97,7 @@ const WhiteBoard = ({ canvasRef, contextRef, elements, setElements, tool }) => {
                 y:offsetY,
                 width:offsetX,
                 height:offsetY,
-                stroke:"black"
+                stroke:color
             }
         ])
     }
@@ -140,15 +151,13 @@ const WhiteBoard = ({ canvasRef, contextRef, elements, setElements, tool }) => {
   };
 
   return (
-    <>
-      <canvas
-        ref={canvasRef}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        className='border h-[100%] w-[100%]'
-      />
-    </>
+    <div
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      className='border h-[100%] w-[100%] overflow-hidden'>
+      <canvas ref={canvasRef}/>
+    </div>
   );
 };
 
