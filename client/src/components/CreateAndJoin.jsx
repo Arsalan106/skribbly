@@ -3,7 +3,7 @@ import React from 'react'
 const CreateAndJoin = () => {
   return (
     <div className='h-screen w-screen flex justify-around items-center bg-black p-8'>
-      {/* Glassmorphism backdrop container */}
+      Glassmorphism backdrop container
       <div className='absolute inset-0 bg-gradient-to-br from-blue-900/20 to-purple-900/20'></div>
       
       {/* Create Room Card */}
