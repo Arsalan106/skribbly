@@ -1,11 +1,21 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import rough from 'roughjs/bin/rough';
 const roughGenerator=rough.generator();
-const WhiteBoard = ({ canvasRef, contextRef, elements, setElements, tool,color,setColor }) => {
+const WhiteBoard = ({ canvasRef, contextRef, elements, setElements, tool,color,setColor,user,socket }) => {
   const [isDrawing, setIsDrawing] = useState(false);
-  const [start,setStart]=useState([]);
-  const [endPoint,setEndPoint]=useState([]);
-  console.log(color)
+  const [img,setImg]=useState("");
+  useEffect(()=>{
+    socket.on("receivedData",(data)=>{
+      setImg(data.imageUrl)
+    })
+  },[img])
+  if(user && !user?.presenter){
+    return (
+      <div className='w-[100%] h-[100%] border overflow-hidden'>
+          <img src={img} alt="real-time white presented by host"/>
+      </div>
+    )
+  }
   useEffect(() => { 
     const canvas = canvasRef.current;
     canvas.width = window.innerWidth;
@@ -27,38 +37,42 @@ const WhiteBoard = ({ canvasRef, contextRef, elements, setElements, tool,color,s
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     const roughCanvas = rough.canvas(canvas);
-    elements.forEach((element) => {
-      // draw free sketch
-      if (element.type === "pencil") {
-        roughCanvas.linearPath(element.path,{stroke:element.stroke,strokeWidth:5,roughness:0});
-      } 
-
-      //draw straight line
-      else if(element.type==="line"){
-        const line=roughGenerator.line(
-            element.x,
-            element.y,
-            element.width,
-            element.height,
-            {stroke:element.stroke,roughness:0,strokeWidth:2}
-
-        )
-        roughCanvas.draw(line)
-      }
-      //draw rectangle
-      else if(element.type==="rectangle"){
-        const rec=roughGenerator.rectangle(
-            element.x,
-            element.y,
-            element.width,
-            element.height,
-            {stroke:element.stroke,roughness:0, strokeWidth: 2}
-        );
-        roughCanvas.draw(rec);
-      }
-    })
+    if(canvasRef){
+      elements.forEach((element) => {
+        // draw free sketch
+        if (element.type === "pencil") {
+          roughCanvas.linearPath(element.path,{stroke:element.stroke,strokeWidth:5,roughness:0});
+        } 
+  
+        //draw straight line
+        else if(element.type==="line"){
+          const line=roughGenerator.line(
+              element.x,
+              element.y,
+              element.width,
+              element.height,
+              {stroke:element.stroke,roughness:0,strokeWidth:2}
+  
+          )
+          roughCanvas.draw(line)
+        }
+        //draw rectangle
+        else if(element.type==="rectangle"){
+          const rec=roughGenerator.rectangle(
+              element.x,
+              element.y,
+              element.width,
+              element.height,
+              {stroke:element.stroke,roughness:0, strokeWidth: 2}
+          );
+          roughCanvas.draw(rec);
+        }
+      })
+    }
+    const drawingData=canvas.toDataURL();
+    socket.emit("whiteBoard",drawingData);
   }, [elements]);
-
+  
   const handleMouseDown = (e) => {
     const { offsetX, offsetY } = e.nativeEvent;
 

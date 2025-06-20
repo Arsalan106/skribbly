@@ -1,6 +1,45 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
+import { Socket } from 'socket.io-client';
 
-const CreateAndJoin = () => {
+const CreateAndJoin = ({uuid,setUser,socket,setJoinUser}) => {
+   const navigate=useNavigate();
+  const [roomId1,setRoom1]=useState("");
+  const [roomName1,setRoomName1]=useState("");
+  const [roomName2,setRoomName2]=useState("");
+  const [roomId2,setRoomId2]=useState("");
+  const handleSubmit=(e)=>{
+    e.preventDefault();
+    console.log(roomName1);
+    console.log(roomId1);
+    const roomData={
+      roomName1,
+      roomId1,
+      userId:uuid(),
+      host:true,
+      presenter:true
+    }
+    setUser(roomData);
+    socket.emit("joinRoom",roomData);
+    navigate(`/${roomId1}`)
+  }
+  const handleJoinRoom=(e)=>{
+    e.preventDefault();
+    console.log(roomId2);
+    console.log(roomName2);
+    const joinData={
+      roomName2,
+      roomId2,
+      userId2:uuid(),
+      host:false,
+      presenter:false
+    }
+    setUser(joinData);
+    socket.emit("joinRoom",joinData);
+    navigate(`/${roomId2}`)
+    
+  }
+
   return (
     <div className='h-screen w-screen flex justify-around items-center bg-black p-8'>
       Glassmorphism backdrop container
@@ -15,16 +54,22 @@ const CreateAndJoin = () => {
               className='border border-gray-600 bg-gray-800 text-white p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400' 
               type="text" 
               placeholder='Enter Your name' 
+              value={roomName1}
+              onChange={(e)=>setRoomName1(e.target.value)}
             />
             <div className='w-full flex rounded-lg border border-gray-600 bg-gray-800 overflow-hidden'>
               <input 
                 className='p-3 w-full bg-transparent text-white focus:outline-none placeholder-gray-400' 
                 type="text" 
+                value={roomId1}
                 placeholder='Generate Room Code'
+                
                 disabled
               />
               <div className='flex'>
                 <button 
+                  onClick={()=>setRoom1(uuid())}
+                
                   className='cursor-pointer bg-gradient-to-r from-blue-600 to-blue-700 px-4 text-white hover:from-blue-700 hover:to-blue-800 transition-all duration-300 flex items-center justify-center'
                   type='button'
                 >
@@ -42,6 +87,7 @@ const CreateAndJoin = () => {
           <button
             className='cursor-pointer w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 mt-6 shadow-lg'
             type='submit'
+            onClick={handleSubmit}
           >
             Create Room
           </button>
@@ -57,16 +103,21 @@ const CreateAndJoin = () => {
               className='border border-gray-600 bg-gray-800 text-white p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder-gray-400' 
               type="text" 
               placeholder='Enter Your name' 
+              value={roomName2}
+              onChange={(e)=>setRoomName2(e.target.value)}
             />
             <input 
               className='border border-gray-600 bg-gray-800 text-white p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder-gray-400' 
               type="text" 
               placeholder='Enter Room Code' 
+              value={roomId2}
+              onChange={(e)=>setRoomId2(e.target.value)}
             />
           </div>
           <button
             className='cursor-pointer w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-lg font-semibold text-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-300 mt-6 shadow-lg'
             type='submit'
+            onClick={handleJoinRoom}
           > 
             Join Room
           </button>

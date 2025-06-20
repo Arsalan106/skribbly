@@ -1,9 +1,9 @@
 import React from 'react'
 import CreateAndJoin from '../components/CreateAndJoin'
-const HomePage = () => {
+const HomePage = ({uuid,setUser,socket,setJoinUser}) => {
   return (
     <div>
-      <CreateAndJoin/>
+      <CreateAndJoin uuid={uuid} setUser={setUser} socket={socket} setJoinUser={setJoinUser}/>
     </div>
   )
 }
