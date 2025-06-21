@@ -12,21 +12,16 @@ function App() {
   const socket=useMemo(()=>io(backendurl),[])
   const [count, setCount] = useState(0);
   const [user,setUser]=useState(null);
+  const [totalUser,setTotalUser]=useState([]);
   const [joinUser,setJoinUser]=useState(null);
-  useEffect(()=>{
-    socket.on("received",(data)=>{
-      if(data.success){
-        console.log("joined succesfully")
-      }
-      else{
-        console.log("something went wrong")
-      }
-    })
-  },[])
 
-
-
-
+  // useEffect(()=>{
+  //   socket.on("received",(data)=>{
+  //       console.log("data",data);
+  //       setTotalUser(data.getUsers);
+  //       console.log("recieved updated users",data.getUsers);
+  //   })
+  // },[])
   const generateId=()=>{
     return (((1+Math.random())*0x10000) | 0).toString(16).substring(1);
   }
@@ -37,7 +32,7 @@ function App() {
     <div className='container'>
       <Routes>
         <Route path='/' element={<HomePage uuid={uuid} setUser={setUser} socket={socket} setJoinUser={setJoinUser} />}></Route>
-        <Route path='/:roomId' element={<RoomPage user={user} socket={socket} />}></Route>
+        <Route path='/:roomId' element={<RoomPage user={user} socket={socket} totalUser={totalUser} />}></Route>
       </Routes>
     </div>
   )

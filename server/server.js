@@ -2,6 +2,7 @@ const express=require("express");
 const cors=require("cors");
 const http=require("http");
 const {Server}=require("socket.io");
+const {updateUsers} =require('./utils/user');
 const e = require("express");
 
 
@@ -29,7 +30,8 @@ io.on("connection",(socket)=>{
         g_roomId=roomId;
         socket.join(roomId);
         console.log("emmiting the messge");
-        socket.emit("received",{success:true});
+        const getUsers=updateUsers(data);
+        socket.emit("received",{success:true,getUsers});
         socket.broadcast.to(roomId).emit("receivedData",{
             imageUrl:imageUrlGlobal
         })

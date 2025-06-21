@@ -1,14 +1,13 @@
 import React, { useRef, useState } from 'react';
 import WhiteBoard from '../components/WhiteBoard';
 
-const RoomPage = ({ user,socket }) => {
+const RoomPage = ({ user,socket,totalUser }) => {
     const [tool, setTool] = useState("pencil");
     const [color, setColor] = useState("#000000");
     const [elements, setElements] = useState([]);
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
     const [prev, setPrev] = useState([]);
-    console.log("ele", elements);
     const clearCanvas = () => {
         const canvas = canvasRef.current;
         const ctx = contextRef.current;
@@ -27,7 +26,8 @@ const RoomPage = ({ user,socket }) => {
 
     return (
         <div className="flex flex-col min-h-screen">
-            <h1 className="text-3xl font-bold text-center my-6 text-gray-800">Welcome to the Whiteboard</h1>
+            <h1 className="text-3xl font-bold text-center my-6 text-gray-800">Welcome to the Whiteboa rd</h1>
+            <p className='flex justify-center text-[50px]'>Online User {totalUser.length} </p>
             {/* { */}
                 {/* user && user.presenter && ( */}
                     <div className="flex flex-col items-center mt-8">
