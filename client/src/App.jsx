@@ -2,31 +2,42 @@ import { useEffect, useMemo, useState } from 'react'
 import { Routes, Route, useNavigate } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import RoomPage from './pages/RoomPage'
-const backendurl='http://localhost:5000'
+const backendurl = 'http://localhost:5000'
 import { io } from 'socket.io-client'
 
 
 
 function App() {
- 
-  const socket=useMemo(()=>io(backendurl),[])
-  const [count, setCount] = useState(0);
-  const [user,setUser]=useState(null);
-  const [totalUser,setTotalUser]=useState([]);
-  const [joinUser,setJoinUser]=useState(null);
 
+  const socket = useMemo(() => io(backendurl, {
+    "force new connection": true,
+    reconnectionAttempts: "Infinity",
+    timeout: 10000,
+    transports: ["websocket"],
+  }), [])
+  const [count, setCount] = useState(0);
+  const [user, setUser] = useState(null);
+  const [totalUser, setTotalUser] = useState([]);
+  const [joinUser, setJoinUser] = useState(null);
+
+  useEffect(() => {
+    socket.on("received", (data) => {
+      console.log("data", data);
+      setTotalUser(data.currUsers);
+      console.log("recieved updated users", data.currUsers);
+    })
+  }, [])
   // useEffect(()=>{
-  //   socket.on("received",(data)=>{
-  //       console.log("data",data);
-  //       setTotalUser(data.getUsers);
-  //       console.log("recieved updated users",data.getUsers);
-  //   })
+    socket.on("allUsers",(data)=>{
+      setTotalUser(data);
+    })
   // },[])
-  const generateId=()=>{
-    return (((1+Math.random())*0x10000) | 0).toString(16).substring(1);
+  const generateId = () => {
+    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    // afjbkdfal
   }
-  const uuid=()=>{
-    return generateId()+generateId()+"-"+generateId()+"-"+generateId()+"-"+generateId()+generateId()+generateId()+generateId();
+  const uuid = () => {
+    return generateId() + generateId() + "-" + generateId() + "-" + generateId() + "-" + generateId() + generateId() + generateId() + generateId();
   }
   return (
     <div className='container'>

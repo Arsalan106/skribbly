@@ -3,7 +3,6 @@ const cors=require("cors");
 const http=require("http");
 const {Server}=require("socket.io");
 const {updateUsers} =require('./utils/user');
-const e = require("express");
 
 
 const app=express();
@@ -11,17 +10,19 @@ app.use(cors())
 
 
 const server=http.createServer(app);
-
+console.log("hello")
 const io=new Server(server,{
     cors:{
-        origin:"http://localhost:5173",
+        origin:"*",
         methods:["GET","POST"],
         credentials:true
+        // fblasfbal
     }
 })
 
 const PORT=process.env.PORT||5000;
 let g_roomId,imageUrlGlobal;
+let users=[];
 io.on("connection",(socket)=>{
     console.log("User connected",socket.id);
     socket.on("joinRoom",(data)=>{
@@ -30,8 +31,13 @@ io.on("connection",(socket)=>{
         g_roomId=roomId;
         socket.join(roomId);
         console.log("emmiting the messge");
-        const getUsers=updateUsers(data);
-        socket.emit("received",{success:true,getUsers});
+        users.push(data);
+        const currUsers=users.filter((user)=>user.roomId==roomId);
+        console.log("user in room ",currUsers);
+
+        socket.emit("received",{success:true,currUsers});
+
+        socket.broadcast.to(roomId).emit("allUsers",currUsers);
         socket.broadcast.to(roomId).emit("receivedData",{
             imageUrl:imageUrlGlobal
         })
