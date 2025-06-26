@@ -1,58 +1,69 @@
-const express=require("express");
-const cors=require("cors");
-const http=require("http");
-const {Server}=require("socket.io");
-const {updateUsers} =require('./utils/user');
+const express = require("express");
+const cors = require("cors");
+const http = require("http");
+const { Server } = require("socket.io");
+const { updatedUsers, getUsersInRoom, removeUser } = require('./utils/user');
 
+const app = express();
+app.use(cors());
 
-const app=express();
-app.use(cors())
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
+const PORT = process.env.PORT || 5000;
+let imageUrlGlobal = null;
+let g_roomId;
+io.on("connection", (socket) => {
+  console.log(" User connected:", socket.id);
 
-const server=http.createServer(app);
-console.log("hello")
-const io=new Server(server,{
-    cors:{
-        origin:"*",
-        methods:["GET","POST"],
-        credentials:true
-        // fblasfbal
+  socket.on("joinRoom", (data) => {
+    const {
+      roomName1, roomName2,
+      roomId1, roomId2,
+      userId, userId2,
+      host, presenter
+    } = data;
+
+    const roomId = roomId1 || roomId2;
+    const roomName = roomName1 || roomName2;
+    const id = userId || userId2;
+    g_roomId=roomId
+    socket.join(roomId);
+
+    const userData = {
+      roomName,
+      roomId,
+      userId: id,
+      host,
+      presenter
+    };
+    const currUsers = updatedUsers(userData);
+    console.log("Users in room:", currUsers);
+
+    socket.emit("received", { success: true, currUsers });
+    socket.broadcast.to(roomId).emit("userJoinedMessage", roomName);
+    io.to(roomId).emit("allUsers", currUsers);
+
+    if (imageUrlGlobal) {
+      socket.emit("receivedData", { imageUrl: imageUrlGlobal });
     }
-})
+  });
 
-const PORT=process.env.PORT||5000;
-let g_roomId,imageUrlGlobal;
-let users=[];
-io.on("connection",(socket)=>{
-    console.log("User connected",socket.id);
-    socket.on("joinRoom",(data)=>{
-        console.log("userJoined",data);
-        const {roomName,roomId,userId,host,presenter}=data;
-        g_roomId=roomId;
-        socket.join(roomId);
-        console.log("emmiting the messge");
-        users.push(data);
-        const currUsers=users.filter((user)=>user.roomId==roomId);
-        console.log("user in room ",currUsers);
+  socket.on("whiteBoard", (data) => {
+    imageUrlGlobal = data;
+      socket.broadcast.to(g_roomId).emit("receivedData", { imageUrl: data });
+  });
+});
 
-        socket.emit("received",{success:true,currUsers});
+app.get('/', (req, res) => {
+  res.send("Server is live");
+});
 
-        socket.broadcast.to(roomId).emit("allUsers",currUsers);
-        socket.broadcast.to(roomId).emit("receivedData",{
-            imageUrl:imageUrlGlobal
-        })
-    })
-    //handle when someones send drawing image
-    socket.on("whiteBoard",(data)=>{
-        console.log("inside white board emmiter");
-        imageUrlGlobal=data;
-        socket.broadcast.to(g_roomId).emit("receivedData",{
-            imageUrl:data,
-        })
-    })
-})
-app.get('/',(req,res)=>{
-    res.send("server is live");
-})
-
-server.listen(PORT,()=>console.log("server is runing on Port",PORT))
+server.listen(PORT, () => {
+  console.log(` Server running on port ${PORT}`);
+});

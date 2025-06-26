@@ -33,8 +33,8 @@ const RoomPage = ({ user, socket, totalUser }) => {
                     <div className='flex-1 overflow-y-auto space-y-2'>
                         {totalUser.map((usr, index) => (
                             <div className='mt-[2%]'>
-                                <p className='text-white'>{user && usr.roomName1} </p>
-                                <p className='text-white'>{user && usr.roomName2}</p>
+                                <p className='text-white'>{user && usr.roomName} </p>
+                                {/* <p className='text-white'>{user && usr.roomName2}</p> */}
                             </div>
                         ))}
                     </div>
@@ -42,7 +42,7 @@ const RoomPage = ({ user, socket, totalUser }) => {
                 </div>
             )}
             <h1 className="text-3xl font-bold text-center my-6 text-gray-800">Welcome to the Whiteboa rd</h1>
-            <p className='flex justify-center text-[50px]'>Online Users : [{totalUser.length}] </p>
+            <p className='flex justify-center text-[50px]'>Online Users : {totalUser.length} </p>
             {/* { */}
             {/* user && user.presenter && ( */}
             <div className="flex flex-col items-center mt-8">
