@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 
@@ -8,6 +9,21 @@ const CreateAndJoin = ({uuid,setUser,socket,setJoinUser}) => {
   const [roomName1,setRoomName1]=useState("");
   const [roomName2,setRoomName2]=useState("");
   const [roomId2,setRoomId2]=useState("");
+  const inputRef=useRef(null);
+  const handleCopy=()=>{
+    const input=inputRef.current;
+    if(!input) return;
+    input.select();
+    input.setSelectionRange(0,9999);
+
+    navigator.clipboard.writeText(input.value)
+    .then(()=>{
+      alert("Copied"+input.value);
+    })
+    .catch((err)=>{
+      console.log("failed to copy text:",err);
+    })
+  }
   const handleSubmit=(e)=>{
     e.preventDefault();
     console.log(roomName1);
@@ -41,8 +57,8 @@ const CreateAndJoin = ({uuid,setUser,socket,setJoinUser}) => {
   }
 
   return (
-    <div className='h-screen w-screen flex justify-around items-center bg-black p-8'>
-      Glassmorphism backdrop container
+    <div className='h-screen w-screen flex justify-around items-center bg-black p-8 mr-5'>
+      {/* Glassmorphism backdrop container */}
       <div className='absolute inset-0 bg-gradient-to-br from-blue-900/20 to-purple-900/20'></div>
       
       {/* Create Room Card */}
@@ -62,9 +78,11 @@ const CreateAndJoin = ({uuid,setUser,socket,setJoinUser}) => {
                 className='p-3 w-full bg-transparent text-white focus:outline-none placeholder-gray-400' 
                 type="text" 
                 value={roomId1}
+                ref={inputRef}
+                // defaultValue={text}
                 placeholder='Generate Room Code'
-                
                 disabled
+                // onChange={(e)=>setText(e.target.value)}
               />
               <div className='flex'>
                 <button 
@@ -76,6 +94,7 @@ const CreateAndJoin = ({uuid,setUser,socket,setJoinUser}) => {
                   Generate
                 </button>
                 <button 
+                  onClick={handleCopy}
                   className=' cursor-pointer bg-gradient-to-r from-red-600 to-red-700 px-4 text-white hover:from-red-700 hover:to-red-800 transition-all duration-300 flex items-center justify-center'
                   type='button'
                 >

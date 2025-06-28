@@ -1,14 +1,30 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState,useEffect } from 'react';
 import WhiteBoard from '../components/WhiteBoard';
+import { toast } from 'react-toastify';
 
-const RoomPage = ({ user, socket, totalUser }) => {
+const RoomPage = ({ user, socket, totalUser,setTotalUser }) => {
     const [tool, setTool] = useState("pencil");
     const [color, setColor] = useState("#000000");
     const [elements, setElements] = useState([]);
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
     const [prev, setPrev] = useState([]);
+    
     const [isOpenUserTab, setIsOpenUserTab] = useState(false);
+    useEffect(() => {
+        // Send user info immediately on connect
+        socket.on("user-left",(data)=>{
+            toast.info(`${data} has left the room`)
+        })
+        socket.on("leftUsers",(data)=>{
+            setTotalUser(data);
+        })
+        return () => {
+            socket.off("user-left");
+            socket.off("leftUsers")
+            socket.disconnect(); 
+        };
+    }, []);
     const clearCanvas = () => {
         const canvas = canvasRef.current;
         const ctx = contextRef.current;
@@ -38,10 +54,10 @@ const RoomPage = ({ user, socket, totalUser }) => {
                             </div>
                         ))}
                     </div>
-                   <input type="text" placeholder='Enter message...' className='bg-white mb-2 text-black p-1 rounded-md placeholder-gray-400 '/>
+                    <input type="text" placeholder='Enter message...' className='bg-white mb-2 text-black p-1 rounded-md placeholder-gray-400 ' />
                 </div>
             )}
-            <h1 className="text-3xl font-bold text-center my-6 text-gray-800">Welcome to the Whiteboa rd</h1>
+            <h1 className="text-3xl font-bold text-center my-6 text-gray-800">Welcome to the Whiteboard</h1>
             <p className='flex justify-center text-[50px]'>Online Users : {totalUser.length} </p>
             {/* { */}
             {/* user && user.presenter && ( */}

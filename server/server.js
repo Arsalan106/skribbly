@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
-const { updatedUsers, getUsersInRoom, removeUser } = require('./utils/user');
+const { updatedUsers, getUsersInRoom, removeUser,getUser } = require('./utils/user');
 
 const app = express();
 app.use(cors());
@@ -18,6 +18,7 @@ const io = new Server(server, {
 const PORT = process.env.PORT || 5000;
 let imageUrlGlobal = null;
 let g_roomId;
+let currUsers=[];
 io.on("connection", (socket) => {
   console.log(" User connected:", socket.id);
 
@@ -40,9 +41,10 @@ io.on("connection", (socket) => {
       roomId,
       userId: id,
       host,
-      presenter
+      presenter,
+      socketId:socket.id
     };
-    const currUsers = updatedUsers(userData);
+    currUsers = updatedUsers(userData);
     console.log("Users in room:", currUsers);
 
     socket.emit("received", { success: true, currUsers });
@@ -58,6 +60,17 @@ io.on("connection", (socket) => {
     imageUrlGlobal = data;
       socket.broadcast.to(g_roomId).emit("receivedData", { imageUrl: data });
   });
+  socket.on("disconnect",()=>{
+    let user=getUser(socket.id);
+    console.log("user disconnected",socket.id);
+    console.log("logged out user",user);
+    let getUpdatedUsers= removeUser(socket.id);
+    io.to(g_roomId).emit("leftUsers",getUpdatedUsers);
+    if(user){
+      socket.broadcast.emit("user-left",user.roomName);
+    }
+    console.log("user afer loggnig out",getUpdatedUsers);
+  })
 });
 
 app.get('/', (req, res) => {

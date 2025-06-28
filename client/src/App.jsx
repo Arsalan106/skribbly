@@ -49,7 +49,7 @@ function App() {
        <ToastContainer />
       <Routes>
         <Route path='/' element={<HomePage uuid={uuid} setUser={setUser} socket={socket} setJoinUser={setJoinUser} />}></Route>
-        <Route path='/:roomId' element={<RoomPage user={user} socket={socket} totalUser={totalUser} />}></Route>
+        <Route path='/:roomId' element={<RoomPage user={user} socket={socket} totalUser={totalUser} setTotalUser={setTotalUser} />}></Route>
       </Routes>
     </div>
   )

@@ -11,7 +11,7 @@ const WhiteBoard = ({ canvasRef, contextRef, elements, setElements, tool,color,s
   },[img])
   if(user && !user?.presenter){
     return (
-      <div className='w-[100%] h-[100%] border overflow-hidden'>
+      <div className='w-[100%] h-[100%] mac-w-full border overflow-hidden'>
           <img src={img} alt="real-time white presented by host"/>
       </div>
     )
