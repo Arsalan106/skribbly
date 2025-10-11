@@ -9,13 +9,7 @@ const WhiteBoard = ({ canvasRef, contextRef, elements, setElements, tool,color,s
       setImg(data.imageUrl)
     })
   },[img])
-  if(user && !user?.presenter){
-    return (
-      <div className='w-[100%] h-[100%] mac-w-full border overflow-hidden'>
-          <img src={img} alt="real-time white presented by host"/>
-      </div>
-    )
-  }
+  
   useEffect(() => { 
     const canvas = canvasRef.current;
     canvas.width = window.innerWidth;
@@ -171,8 +165,14 @@ const WhiteBoard = ({ canvasRef, contextRef, elements, setElements, tool,color,s
       onMouseUp={handleMouseUp}
       className='border h-[100%] w-[100%] overflow-hidden'>
       <canvas ref={canvasRef}/>
+     {img && (
+        <img
+          src={img}
+          alt="shared whiteboard"
+          className="absolute top-[34.55%] left-[11.9%] w-full h-full pointer-events-none opacity-80"
+        />
+      )}
     </div>
   );
 };
-
 export default WhiteBoard;

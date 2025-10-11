@@ -19,6 +19,7 @@ const PORT = process.env.PORT || 5000;
 let imageUrlGlobal = null;
 let g_roomId;
 let currUsers=[];
+let g_room={};
 io.on("connection", (socket) => {
   console.log(" User connected:", socket.id);
 
@@ -34,6 +35,8 @@ io.on("connection", (socket) => {
     const roomName = roomName1 || roomName2;
     const id = userId || userId2;
     g_roomId=roomId
+    // const player={id:socket.id,name:roomName};
+    // g_room[roomId].players.push(player);
     socket.join(roomId);
 
     const userData = {

@@ -8,6 +8,7 @@ import { io } from 'socket.io-client'
 
 
 
+
 function App() {
 
   const socket = useMemo(() => io(backendurl, {
@@ -16,7 +17,6 @@ function App() {
     timeout: 10000,
     transports: ["websocket"],
   }), [])
-  const [count, setCount] = useState(0);
   const [user, setUser] = useState(null);
   const [totalUser, setTotalUser] = useState([]);
   const [joinUser, setJoinUser] = useState(null);

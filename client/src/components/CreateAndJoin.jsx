@@ -10,6 +10,7 @@ const CreateAndJoin = ({uuid,setUser,socket,setJoinUser}) => {
   const [roomName2,setRoomName2]=useState("");
   const [roomId2,setRoomId2]=useState("");
   const inputRef=useRef(null);
+
   const handleCopy=()=>{
     const input=inputRef.current;
     if(!input) return;
