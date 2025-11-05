@@ -3,8 +3,8 @@ import { Routes, Route, useNavigate } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify';
 import HomePage from './pages/HomePage'
 import RoomPage from './pages/RoomPage'
-// const backendurl = 'http://localhost:5000'
-const backendurl=import.meta.env.VITE_BACKEND_URL;
+const backendurl = 'http://localhost:5000'
+// const backendurl=import.meta.env.VITE_BACKEND_URL;
 import { io } from 'socket.io-client'
 
 
